@@ -13,12 +13,12 @@ import (
 	"github.com/MonalBarse/referral-hub/internal/config"
 	"github.com/MonalBarse/referral-hub/internal/db"
 	"github.com/MonalBarse/referral-hub/internal/router"
+	"github.com/MonalBarse/referral-hub/internal/ws"
 )
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
-	// Cancelled on Ctrl-C or SIGTERM, which starts the graceful shutdown below.
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
@@ -34,9 +34,11 @@ func main() {
 		log.Fatalf("startup: migrate: %v", err)
 	}
 
+	hub := ws.NewHub()
+
 	srv := &http.Server{
 		Addr:              ":" + cfg.Port,
-		Handler:           router.New(router.Deps{Cfg: *cfg, Pool: pool}),
+		Handler:           router.New(router.Deps{Cfg: cfg, Pool: pool, Hub: hub}),
 		ReadHeaderTimeout: 10 * time.Second,
 	}
 
@@ -50,7 +52,6 @@ func main() {
 	<-ctx.Done()
 	log.Println("api: shutting down")
 
-	// Give in-flight requests a moment to finish instead of cutting them off.
 	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(shutdownCtx); err != nil {
