@@ -12,8 +12,6 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// Connect opens the pool and verifies it with a ping, so a bad DATABASE_URL
-// fails at startup rather than on the first request.
 func Connect(ctx context.Context, url string) (*pgxpool.Pool, error) {
 	cfg, err := pgxpool.ParseConfig(url)
 	if err != nil {
@@ -37,8 +35,8 @@ func Connect(ctx context.Context, url string) (*pgxpool.Pool, error) {
 }
 
 // Migrate applies every .sql file in dir that has not run yet, in filename
-// order, each inside its own transaction. Applied names are recorded in
-// schema_migrations so restarting the server is a no-op.
+// order, each inside its own transaction.
+// Applied names are recorded in schema_migrations so restarting the server is a no-op.
 func Migrate(ctx context.Context, pool *pgxpool.Pool, dir string) error {
 	_, err := pool.Exec(ctx, `
 		CREATE TABLE IF NOT EXISTS schema_migrations (
