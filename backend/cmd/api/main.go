@@ -38,7 +38,7 @@ func main() {
 
 	srv := &http.Server{
 		Addr:              ":" + cfg.Port,
-		Handler:           router.New(router.Deps{Cfg: cfg, Pool: pool, Hub: hub}),
+		Handler:           router.New(router.Deps{Cfg: *cfg, Pool: pool, Hub: hub}),
 		ReadHeaderTimeout: 10 * time.Second,
 	}
 

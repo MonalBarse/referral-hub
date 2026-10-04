@@ -14,10 +14,10 @@ type Config struct {
 
 // load reads config, fallling back to devlopment defaults. Every value has a default so we can boot the app without wriging a .env first
 
-func Load() *Config {
-	cfg := &Config{
-		Port:        getEnv("PORT", "8080"),
-		DatabaseURL: getEnv("DATABASE_URL", "postgres://referhub:referhub@localhost:5432/referhub?sslmode=disable"),
+func Load() Config {
+	cfg := Config{
+		Port:        getEnv("PORT", "8090"),
+		DatabaseURL: getEnv("DATABASE_URL", "postgres://referhub:referhub@localhost:5434/referhub?sslmode=disable"),
 		JWTSecret:   getEnv("JWT_SECRET", "dev-only-insecure-secret"),
 		CORSOrigin:  getEnv("CORS_ORIGIN", "http://localhost:3001"),
 	}
